@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -222,6 +222,7 @@
 
         // 宣告全域變數
         let telData = null;
+        let dispatchData = null;  // 新增調度資料全域變數
 
         function searchTel() {
             const input = document.getElementById('telSearchInput').value.trim();
@@ -335,19 +336,126 @@ DID號碼: ${didNumber}
             }
         }
 
-        // 頁面載入時自動讀取分機資料
-        fetch('./tel/電話資料.xlsx')
-            .then(response => response.arrayBuffer())
-            .then(data => {
-                const workbook = XLSX.read(data, { type: 'array' });
-                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                telData = XLSX.utils.sheet_to_json(worksheet);
-                console.log('分機資料載入成功', telData); // 添加日誌
-            })
-            .catch(error => {
-                alert('讀取分機資料時發生錯誤，請確認檔案位置是否正確');
-                console.error('讀取分機資料時發生錯誤:', error);
-            });
+        function searchDispatch() {
+            const input = document.getElementById('dispatchSearchInput').value.trim();
+            if (input === "") {
+                alert('請輸入調度號碼');
+                return;
+            }
+
+            const dispatchNumber = parseInt(input);
+            const result = dispatchData.find(item =>
+                item['分機號碼'] === dispatchNumber
+            );
+
+            if (result) {
+                const unit = result['使用單位'] || '無資料';
+                const lens = result['LENS'] || '無資料';
+                const lineGroupCurrent = result['線組編號(現場)'] || '無資料';
+                const lineGroupControl = result['線組編號(現場)'] || '無資料';
+                const location = result['裝機位置'] || '無資料';
+                const subCount = result['副機數量'] || '無資料';
+                const telNumber = result['分機號碼'] || input;
+
+                // 準備 Telegram 訊息內容
+                const telegramMessage = `
+調度電話搜尋結果:
+分機號碼: ${telNumber}
+使用單位: ${unit}
+LENS: ${lens}
+線組編號(現場): ${lineGroupCurrent}
+線組編號(控制室): ${lineGroupControl}
+裝機位置: ${location}
+副機數量: ${subCount}
+`;
+
+                // 發送到 Telegram
+                const botToken = '5615970654:AAEiOd-m4fmQkps70wkZlvcwLvguk12FLNk';
+                const chatId = '-677659610';
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: telegramMessage,
+                        parse_mode: 'HTML'
+                    })
+                }).catch(error => console.error('發送 Telegram 訊息失敗:', error));
+
+                const resultWindow = window.open("", "_blank");
+                resultWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="zh-Hant">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>調度電話搜尋結果</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                background-color: #f0f0f0;
+                            }
+                            .result-container {
+                                width: 400px;
+                                margin: 0 auto;
+                                background-color: #fff;
+                                padding: 20px;
+                                border-radius: 5px;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            }
+                            .result-item {
+                                margin-bottom: 10px;
+                                text-align: left;
+                            }
+                            .label {
+                                font-weight: bold;
+                                margin-right: 10px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="result-container">
+                            <div class="result-item"><span class="label">分機號碼:</span>${telNumber}</div>
+                            <div class="result-item"><span class="label">使用單位:</span>${unit}</div>
+                            <div class="result-item"><span class="label">LENS:</span>${lens}</div>
+                            <div class="result-item"><span class="label">線組編號(現場):</span>${lineGroupCurrent}</div>
+                            <div class="result-item"><span class="label">線組編號(控制室):</span>${lineGroupControl}</div>
+                            <div class="result-item"><span class="label">裝機位置:</span>${location}</div>
+                            <div class="result-item"><span class="label">副機數量:</span>${subCount}</div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                resultWindow.document.close();
+            } else {
+                alert('未找到符合的調度電話資料');
+            }
+        }
+
+        // 頁面載入時自動讀取分機資料和調度資料
+        Promise.all([
+            fetch('./tel/電話資料.xlsx').then(response => response.arrayBuffer()),
+            fetch('./tel/調度資料.xlsx').then(response => response.arrayBuffer())
+        ]).then(([telBuffer, dispatchBuffer]) => {
+            // 讀取分機資料
+            const telWorkbook = XLSX.read(telBuffer, { type: 'array' });
+            const telWorksheet = telWorkbook.Sheets[telWorkbook.SheetNames[0]];
+            telData = XLSX.utils.sheet_to_json(telWorksheet);
+            console.log('分機資料載入成功', telData);
+
+            // 讀取調度資料
+            const dispatchWorkbook = XLSX.read(dispatchBuffer, { type: 'array' });
+            const dispatchWorksheet = dispatchWorkbook.Sheets[dispatchWorkbook.SheetNames[0]];
+            dispatchData = XLSX.utils.sheet_to_json(dispatchWorksheet);
+            console.log('調度資料載入成功', dispatchData);
+        }).catch(error => {
+            alert('讀取資料時發生錯誤，請確認檔案位置是否正確');
+            console.error('讀取資料時發生錯誤:', error);
+        });
 
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault(); // 禁止右鍵菜單
@@ -367,6 +475,10 @@ DID號碼: ${didNumber}
         <!-- 新增分機搜尋區域 -->
         <input type="text" id="telSearchInput" placeholder="搜尋分機..." style="font-size: 20px; width: 300px; margin-top: 10px;" />
         <button onclick="searchTel()" style="background: linear-gradient(to bottom, #FF6B6B, #CD5C5C); color: white; font-weight: bold;">分機資料搜尋</button>
+
+        <!-- 新增調度電話搜尋區域 -->
+        <input type="text" id="dispatchSearchInput" placeholder="搜尋調度電話..." style="font-size: 20px; width: 300px; margin-top: 10px;" />
+        <button onclick="searchDispatch()" style="background: linear-gradient(to bottom, #4169E1, #000080); color: white; font-weight: bold;">調度電話搜尋</button>
     </div>
     <script>
         function searchImages() {
