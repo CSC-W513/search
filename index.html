@@ -1,3 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>資料查詢</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('back.jpg'); /* 設定背景圖 */
+            background-size: cover; /* 背景圖覆蓋整個畫面 */
+            background-position: center; /* 背景圖置中 */
+        }
+        .container {
+            display: flex;
+            flex-direction: column; /* 垂直排列 */
+            align-items: center; /* 置中對齊 */
+        }
+        button {
+            margin: 10px 0;
+            padding: 10px 20px;
+            font-size: 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 6px #999;
+            transition: all 0.3s ease;
+            position: relative;
+            top: 0;
+            background: linear-gradient(to bottom, #4169E1, #0000CD);
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        button:hover {
+            background: linear-gradient(to bottom, #4169E1, #1E90FF);
+        }
+        button:active {
+            top: 5px;
+            box-shadow: 0 1px #666;
+            background: linear-gradient(to bottom, #0000CD, #4169E1);
+        }
+        .option {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #000;
+            margin: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px #999;
+            transition: all 0.3s ease;
+            position: relative;
+            top: 0;
+            background: linear-gradient(to bottom, #90EE90, #32CD32);
+        }
+        .option:hover {
+            background: linear-gradient(to bottom, #90EE90, #1E90FF);
+        }
+        .option:active {
+            top: 5px;
+            box-shadow: 0 1px #666;
+            background: linear-gradient(to bottom, #32CD32, #90EE90);
+        }
+    </style>
+    <script>
+        function openNewPage(group, buttonNames, imagePaths) {
+            const newWindow = window.open("", "_blank");
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="zh-Hant">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${group} 選項</title>
+                    <style>
+                        body {
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            margin: 0;
+                            padding: 20px;
+                            font-family: Arial, sans-serif;
+                            box-sizing: border-box;
+                        }
+                        .option {
+                            width: 100px;
+                            height: 100px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            border: 1px solid #000;
+                            margin: 5px;
+                            font-size: 18px;
+                            cursor: pointer;
+                            background-color: rgba(57, 255, 20, 0.8);
+                            color: black;
+                            transition: all 0.3s ease;
+                            box-shadow: 0 5px #666;
+                            outline: none;
+                        }
+                        .option:hover {
+                            background-color: rgba(57, 255, 20, 1);
+                        }
+                        /* 新增圖片顯示視窗的樣式 */
+                        .image-window {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: white;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            z-index: 1000;
+                        }
+                        .image-window img {
+                            max-width: 100%;
+                            max-height: 100%;
+                            object-fit: contain;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${Array.from({ length: buttonNames.length }, (_, i) => `
+                        <div class="option" onclick="window.open('${imagePaths[i]}', '_blank', 'width=800,height=600').document.write('<html><head><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:white;}img{max-width:100%;max-height:100vh;object-fit:contain;}</style></head><body><img src=\\'${imagePaths[i]}\\' /></body></html>')">
+                            ${buttonNames[i]}
+                        </div>
+                    `).join('')}
+                </body>
+                </html>
+            `);
+            newWindow.document.close();
+        }
+
+        function searchImages() {
+            const input = document.getElementById('searchInput').value.toLowerCase().trim(); // 去除前後空白
+            if (input === "") {
+                alert('請輸入搜尋內容'); // 提示用戶輸入內容
+                return; // 退出函數
+            }
+            const images = [
+             
+            ];
+            const filteredImages = images.filter(image => image.toLowerCase().includes(input));
+            if (filteredImages.length > 0) {
+                const newWindow = window.open("", "_blank");
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="zh-Hant">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>搜尋結果</title>
+                        <style>
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                min-height: 100vh;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                background: #f0f0f0;
+                            }
+                            .back-button {
+                                position: fixed;
+                                top: 20px;
+                                left: 20px;
+                                padding: 10px 20px;
+                                background: #007bff;
+                                color: white;
+                                border: none;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                z-index: 1000;
+                            }
+                            .back-button:hover {
+                                background: #0056b3;
+                            }
+                            .image-container {
+                                width: 100%;
+                                max-width: 100vw;
+                                padding: 20px;
+                                box-sizing: border-box;
+                            }
+                            img {
+                                width: 100%;
+                                height: auto;
+                                max-height: 90vh;
+                                object-fit: contain;
+                                display: block;
+                                margin: 10px auto;
+                                background: white;
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="back-button" onclick="window.close()">返回上一頁</button>
+                        <div class="image-container">
+                            ${filteredImages.map(img => `<img src="${img}" alt="搜尋結果" />`).join('')}
+                        </div>
+                    </body>
+                    </html>
+                `);
+                newWindow.document.close();
+            } else {
+                alert('未找到符合的圖片');
+            }
+        }
+
+        // 宣告全域變數
+        let telData = null;
+        let dispatchData = null;  // 新增調度資料全域變數
+
+        function searchTel() {
+            const input = document.getElementById('telSearchInput').value.trim();
+            if (input === "") {
+                alert('請輸入分機號碼');
+                return;
+            }
+
+            const telNumber = parseInt(input);
+            const result = telData.find(item =>
+                item['分機號碼'] === telNumber ||
+                item['分機'] === telNumber ||
+                item['Tel'] === telNumber
+            );
+
+            if (result) {
+                const unit = result['使用單位'] || result['單位'] || result['部門'] || '無資料';
+                const lineGroup = result['線組編號'] || '無資料';
+                const telType = result['分機種類'] || '無資料';
+                const subTelCount = result['副機數量'] || '無資料';
+                const installLocation = result['裝機位置'] || '無資料';
+                const g450Port = result['G450 Port'] || '無資料';
+                const telNumber = result['分機號碼'] || result['分機'] || result['Tel'] || input;
+                const didNumber = result['對應DID號碼'] || '無資料';
+                const relocationRecord = result['拆遷記錄'] || '無資料';
+                const remark = result['備註'] || '無資料';
+
+                // 準備 Telegram 訊息內容
+                const telegramMessage = `
+分機搜尋結果:
+分機號碼: ${telNumber}
+使用單位: ${unit}
+線組編號: ${lineGroup}
+G450 Port: ${g450Port}
+分機種類: ${telType}
+副機數量: ${subTelCount}
+DID號碼: ${didNumber}
+裝機位置: ${installLocation}
+拆遷紀錄: ${relocationRecord}
+備註: ${remark}
+`;
+
+                // 發送到 Telegram (使用 fetch)
+                const botToken = '5615970654:AAEiOd-m4fmQkps70wkZlvcwLvguk12FLNk';
+                const chatId = '-677659610';
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: telegramMessage,
+                        parse_mode: 'HTML'
+                    })
+                }).catch(error => console.error('發送 Telegram 訊息失敗:', error));
+
+                const resultWindow = window.open("", "_blank");
+                resultWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="zh-Hant">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>分機搜尋結果</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                background-color: #f0f0f0;
+                            }
+                            .result-container {
+                                width: 400px;
+                                margin: 0 auto;
+                                background-color: #fff;
+                                padding: 20px;
+                                border-radius: 5px;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            }
+                            .result-item {
+                                margin-bottom: 10px;
+                                text-align: left;
+                            }
+                            .label {
+                                font-weight: bold;
+                                margin-right: 10px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="result-container">
+                            <div class="result-item"><span class="label">分機號碼:</span>${telNumber}</div>
+                            <div class="result-item"><span class="label">使用單位:</span>${unit}</div>
+                            <div class="result-item"><span class="label">線組編號:</span>${lineGroup}</div>
+                            <div class="result-item"><span class="label">G450 Port:</span>${g450Port}</div>
+                            <div class="result-item"><span class="label">分機種類:</span>${telType}</div>
+                            <div class="result-item"><span class="label">副機數量:</span>${subTelCount}</div>
+                            <div class="result-item"><span class="label">DID號碼:</span>${didNumber}</div>
+                            <div class="result-item"><span class="label">裝機位置:</span>${installLocation}</div>
+                            <div class="result-item"><span class="label">拆遷紀錄:</span>${relocationRecord}</div>
+                            <div class="result-item"><span class="label">備註:</span>${remark}</div>
+                            
+                        </div>
+                    </body>
+                    </html>
+                `);
+                resultWindow.document.close();
+            } else {
+                alert('未找到符合的分機資料');
+            }
+        }
+
+        function searchDispatch() {
+            const input = document.getElementById('dispatchSearchInput').value.trim();
+            if (input === "") {
+                alert('請輸入調度號碼');
+                return;
+            }
+
+            const dispatchNumber = parseInt(input);
+            const result = dispatchData.find(item =>
+                item['分機號碼'] === dispatchNumber
+            );
+
+            if (result) {
+                const unit = result['使用單位'] || '無資料';
+                const lens = result['LENS'] || '無資料';
+                const lineGroupCurrent = result['線組編號(現場)'] || '無資料';
+                const lineGroupControl = result['線組編號(現場)'] || '無資料';
+                const location = result['裝機位置'] || '無資料';
+                const subCount = result['副機數量'] || '無資料';
+                const telNumber = result['分機號碼'] || input;
+
+                // 準備 Telegram 訊息內容
+                const telegramMessage = `
+調度電話搜尋結果:
+分機號碼: ${telNumber}
+使用單位: ${unit}
+LENS: ${lens}
+線組編號(現場): ${lineGroupCurrent}
+線組編號(控制室): ${lineGroupControl}
+裝機位置: ${location}
+副機數量: ${subCount}
+`;
+
+                // 發送到 Telegram
+                const botToken = '5615970654:AAEiOd-m4fmQkps70wkZlvcwLvguk12FLNk';
+                const chatId = '-677659610';
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: telegramMessage,
+                        parse_mode: 'HTML'
+                    })
+                }).catch(error => console.error('發送 Telegram 訊息失敗:', error));
+
+                const resultWindow = window.open("", "_blank");
+                resultWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="zh-Hant">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>調度電話搜尋結果</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                background-color: #f0f0f0;
+                            }
+                            .result-container {
+                                width: 400px;
+                                margin: 0 auto;
+                                background-color: #fff;
+                                padding: 20px;
+                                border-radius: 5px;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            }
+                            .result-item {
+                                margin-bottom: 10px;
+                                text-align: left;
+                            }
+                            .label {
+                                font-weight: bold;
+                                margin-right: 10px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="result-container">
+                            <div class="result-item"><span class="label">分機號碼:</span>${telNumber}</div>
+                            <div class="result-item"><span class="label">使用單位:</span>${unit}</div>
+                            <div class="result-item"><span class="label">LENS:</span>${lens}</div>
+                            <div class="result-item"><span class="label">線組編號(現場):</span>${lineGroupCurrent}</div>
+                            <div class="result-item"><span class="label">線組編號(控制室):</span>${lineGroupControl}</div>
+                            <div class="result-item"><span class="label">裝機位置:</span>${location}</div>
+                            <div class="result-item"><span class="label">副機數量:</span>${subCount}</div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                resultWindow.document.close();
+            } else {
+                alert('未找到符合的調度電話資料');
+            }
+        }
+
+        // 頁面載入時自動讀取分機資料和調度資料
+        Promise.all([
+            fetch('./tel/電話資料.xlsx').then(response => response.arrayBuffer()),
+            fetch('./tel/調度資料.xlsx').then(response => response.arrayBuffer())
+        ]).then(([telBuffer, dispatchBuffer]) => {
+            // 讀取分機資料
+            const telWorkbook = XLSX.read(telBuffer, { type: 'array' });
+            const telWorksheet = telWorkbook.Sheets[telWorkbook.SheetNames[0]];
+            telData = XLSX.utils.sheet_to_json(telWorksheet);
+            console.log('分機資料載入成功', telData);
+
+            // 讀取調度資料
+            const dispatchWorkbook = XLSX.read(dispatchBuffer, { type: 'array' });
+            const dispatchWorksheet = dispatchWorkbook.Sheets[dispatchWorkbook.SheetNames[0]];
+            dispatchData = XLSX.utils.sheet_to_json(dispatchWorksheet);
+            console.log('調度資料載入成功', dispatchData);
+        }).catch(error => {
+            alert('讀取資料時發生錯誤，請確認檔案位置是否正確');
+            console.error('讀取資料時發生錯誤:', error);
+        });
+
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault(); // 禁止右鍵菜單
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault(); // 禁止 F12 和 Ctrl+Shift+I
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="searchInput" placeholder="搜尋圖片..." style="font-size: 20px; width: 300px;" />
+        <button onclick="searchImages()" style="background: linear-gradient(to bottom, #32CD32, #228B22); color: yellow; font-weight: bold; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);">天車與PA資料搜尋</button>
+        <!-- 新增分機搜尋區域 -->
+        <input type="text" id="telSearchInput" placeholder="搜尋分機..." style="font-size: 20px; width: 300px; margin-top: 10px;" />
+        <button onclick="searchTel()" style="background: linear-gradient(to bottom, #FF6B6B, #CD5C5C); color: white; font-weight: bold;">分機資料搜尋</button>
+
+        <!-- 新增調度電話搜尋區域 -->
+        <input type="text" id="dispatchSearchInput" placeholder="搜尋調度電話..." style="font-size: 20px; width: 300px; margin-top: 10px;" />
+        <button onclick="searchDispatch()" style="background: linear-gradient(to bottom, #4169E1, #000080); color: white; font-weight: bold;">調度電話搜尋</button>
+    </div>
+    <script>
+        function searchImages() {
+            const input = document.getElementById('searchInput').value.toLowerCase().trim(); // 去除前後空白
+            if (input === "") {
+                alert('請輸入搜尋內容'); // 提示用戶輸入內容
+                return; // 退出函數
+            }
+            const images = [
+             'group_4/6SCC80T1.jpg', 'group_4/6SCC80T2.jpg', 'group_4/A11611.jpg', 'group_4/A11612.jpg', 'group_4/A35311.jpg', 'group_4/A53411.jpg', 'group_4/B35411.jpg', 'group_4/B35412.jpg', 
+             'group_4/B35421.jpg', 'group_4/B35422.jpg', 'group_4/B54611.jpg', 'group_4/B54612.jpg', 'group_4/B57311.jpg', 'group_4/B59121.jpg', 'group_4/B59122.jpg', 
+             'group_4/B62111.jpg', 'group_4/B62112.jpg', 'group_4/B62221.jpg', 'group_4/B62222.jpg', 'group_4/C11011.jpg', 'group_4/C11012.jpg', 'group_4/C11211.jpg','group_4/C11711.jpg', 
+             'group_4/C11712.jpg', 'group_4/C11811.jpg', 'group_4/C11911.jpg', 'group_4/C11912.jpg', 'group_4/C35311.jpg', 'group_4/C35312.jpg', 'group_4/C35321.jpg', 'group_4/C35322.jpg', 'group_4/C35611.jpg', 
+             'group_4/C35612.jpg', 'group_4/C35711.jpg', 'group_4/C35712.jpg', 'group_4/C52411.jpg', 'group_4/C53511.jpg', 'group_4/C53512.jpg', 'group_4/C54711.jpg', 
+             'group_4/C54712.jpg', 'group_4/CSU11.jpg', 'group_4/CSU12.jpg', 'group_4/CSU21.jpg', 'group_4/CSU22.jpg', 'group_4/D35311.jpg', 'group_4/D35312.jpg', 
+             'group_4/D35321.jpg', 'group_4/D35322.jpg', 'group_4/D56421.jpg', 'group_4/D56422.jpg', 'group_4/E54411.jpg', 'group_4/E54412.jpg', 'group_4/E54511.jpg', 
+             'group_4/E54512.jpg', 'group_4/F61011.jpg', 'group_4/F61012.jpg', 'group_4/F61021.jpg', 'group_4/F61022.jpg', 'group_4/F61031.jpg', 'group_4/F61032.jpg', 
+             'group_4/H52521.jpg', 'group_4/H53511.jpg', 'group_4/H53512.jpg', 'group_4/H53521.jpg', 'group_4/H53522.jpg', 'group_4/J48111.jpg', 'group_4/J48112.jpg', 
+             'group_4/J61011.jpg', 'group_4/J61012.jpg', 'group_4/J61021.jpg', 'group_4/J61022.jpg', 'group_4/J61031.jpg', 'group_4/J610320.jpg', 'group_4/J61041.jpg', 
+             'group_4/J61042.jpg', 'group_4/J61051.jpg', 'group_4/J61052.jpg', 'group_4/J61061.jpg', 'group_4/J61062.jpg', 'group_4/J61071.jpg', 'group_4/J61072.jpg', 
+             'group_4/J64111.jpg', 'group_4/J64112.jpg', 'group_4/J68011.jpg', 'group_4/J68012.jpg', 'group_4/J68021.jpg', 'group_4/J68022.jpg', 'group_4/J68031.jpg', 
+             'group_4/J68032.jpg', 'group_4/J68041.jpg', 'group_4/J68042.jpg', 'group_4/J68051.jpg', 'group_4/J68052.jpg', 'group_4/J68071.jpg', 'group_4/J68072.jpg', 
+             'group_4/K61611.jpg', 'group_4/K61612.jpg', 'group_4/K61621.jpg', 'group_4/K61622.jpg', 'group_4/K64221.jpg', 'group_4/K64222.jpg', 'group_4/N62011.jpg', 
+             'group_4/N62012.jpg', 'group_4/N62021.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q54121.jpg','group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
+             'group_4/T35311.jpg', 'group_4/T35312.jpg', 'group_4/T35321.jpg', 'group_4/T35322.jpg', 'group_4/T48311.jpg', 'group_4/T48312.jpg', 'group_4/T51711.jpg', 
+             'group_4/T51712.jpg', 'group_4/T51821.jpg', 'group_4/T51822.jpg', 'group_4/T68021.jpg', 'group_4/T68022.jpg', 'group_4/T68041.jpg', 'group_4/T68042.jpg', 
+             'group_4/T68051.jpg', 'group_4/U61251.jpg', 'group_4/U61252.jpg', 'group_4/U62121.jpg', 'group_4/U62122.jpg', 'group_4/Y52121.jpg', 'group_4/Y53111.jpg', 
+             'group_4/Y53112.jpg', 'group_4/Y54101.jpg', 'group_4/Y54102.jpg', 'group_4/Z68011.jpg', 'group_4/Z68012.jpg', 'group_4/Z68021.jpg', 'group_4/Z68022.jpg', 
+             'group_4/Z68031.jpg', 'group_4/Z68032.jpg', 'group_4/Z68041.jpg', 'group_4/Z68042.jpg', 'group_4/Z68061.jpg', 'group_4/Z68062.jpg', 'group_4/Z68071.jpg', 'group_4/W5core.jpg','group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/CM.jpg', 
+             'group_4/密碼.jpg', 'group_4/分機1.jpg', 'group_4/分機2.jpg', 'group_4/分機3.jpg', 'group_4/分機4.jpg', 'group_4/分機5.jpg', 'group_4/分機6.jpg', 'group_4/分機7.jpg','group_4/分機8.jpg',   
+             'group_3/C346立體倉儲高聲電話系統圖.JPG', 'group_3/PKL-檢驗站高聲電話系統圖.JPG', 
+             'group_3/SCC-4.5 E-F  4161-4162天車  三階.JPG', 'group_3/W3三階廠內(F3)PA系統位置圖-0001.JPG', 'group_3/W3三階廠內(F3)PA系統位置圖-0002.JPG', 'group_3/W3三階轉爐廠間高聲電話系統圖(含位置).JPG',
+             'group_3/W3對4121天車CO系統位置圖.JPG', 'group_3/W3對4151天車RO系統位置圖.JPG', 'group_3/W3對4161天車T1系統位置圖.JPG', 'group_3/W21一二階煉焦廠PA位置圖.JPG', 'group_3/W21一二階煉焦廠PA系統圖.JPG',
+             'group_3/W21三階煉焦廠PA位置圖.JPG', 'group_3/W21三階煉焦廠PA系統圖.JPG', 'group_3/W212-3推焦車-PA.JPG','group_3/W214-3CDQPA系統圖.JPG', 'group_3/W214-4CDQ高聲電話系統圖.JPG', 'group_3/W214-5號導焦-PA.JPG',
+             'group_3/W214-6加料車-PA.JPG', 'group_3/W372_KR_F3高聲電話系統圖.JPG', 'group_3/W373-2RH高聲電話系統圖.JPG', 'group_3/W373-3LF高聲電話系統圖.JPG', 'group_3/Y52電氣鍍鋅場(EGL)PA位置圖.JPG',
+             'group_3/Y52電氣鍍鋅場(EGL)PA系統圖.JPG', 'group_3/Y511PLCM高聲電話位置圖.JPG', 'group_3/Y511PLCM高聲電話系統圖.JPG', 'group_3/Y523-2CAL高聲電話位置圖.JPG', 'group_3/Y523-2CAL高聲電話系統圖.JPG','group_3/g4.jpg',
+            ];
+            const filteredImages = images.filter(image => image.toLowerCase().includes(input));
+            if (filteredImages.length > 0) {
+                const newWindow = window.open("", "_blank");
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="zh-Hant">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>搜尋結果</title>
+                        <style>
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                min-height: 100vh;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                background: #f0f0f0;
+                            }
+                            .image-container {
+                                width: 100%;
+                                max-width: 100vw;
+                                padding: 20px;
+                                box-sizing: border-box;
+                            }
+                            img {
+                                width: 100%;
+                                height: auto;
+                                max-height: 90vh;
+                                object-fit: contain;
+                                display: block;
+                                margin: 10px auto;
+                                background: white;
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="image-container">
+                            ${filteredImages.map(img => `<img src="${img}" alt="搜尋結果" />`).join('')}
+                        </div>
+                    </body>
+                    </html>
+                `);
+                newWindow.document.close();
+            } else {
+                alert('未找到符合的圖片');
+            }
+        }
+    </script>
+</body>
+</html>
+
 ﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
