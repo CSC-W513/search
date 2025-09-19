@@ -357,18 +357,18 @@
                 let telegramMessage = '分機搜尋結果:\n';
                 results.forEach((result, index) => {
                     telegramMessage += `\n--- 結果 ${index + 1} ---\n`;
-                    telegramMessage += `號碼: ${result['號碼'] || result['分機'] || result['Tel'] || ''}\n`;
-                    telegramMessage += `單位: ${result['單位'] || result['單位'] || result['部門'] || ''}\n`;
-                    telegramMessage += `LENS: ${result['LENS'] || ''}\n`;
-                    telegramMessage += `機房端子編號: ${result['機房端子編號'] || ''}\n`;
-                    telegramMessage += `遠端機櫃UG-50編號: ${result['遠端機櫃UG-50編號'] || ''}\n`;
-                    telegramMessage += `線組編號: ${result['線組編號'] || ''}\n`;
+                    telegramMessage += `號碼: ${result['號碼'] || result['分機'] || result['Tel'] || '無資料'}\n`;
+                    telegramMessage += `單位: ${result['單位'] || result['單位'] || result['部門'] || '無資料'}\n`;
+                    telegramMessage += `LENS: ${result['LENS'] || '無資料'}\n`;
+                    telegramMessage += `機房端子編號: ${result['機房端子編號'] || '無資料'}\n`;
+                    telegramMessage += `遠端機櫃UG-50編號: ${result['遠端機櫃UG-50編號'] || '無資料'}\n`;
+                    telegramMessage += `線組編號: ${result['線組編號'] || '無資料'}\n`;
                     telegramMessage += `DID: ${result['DID'] || '無資料'}\n`;
-                    telegramMessage += `裝機位置: ${result['裝機位置'] || ''}\n`;
-                    telegramMessage += `通話等級: ${result['通話等級'] || ''}\n`;
-                    telegramMessage += `副機數量: ${result['副機數量'] || ''}\n`;
-                    telegramMessage += `數位: ${result['數位'] || ''}\n`;
-                    telegramMessage += `備註: ${result['備註'] || ''}\n`;
+                    telegramMessage += `裝機位置: ${result['裝機位置'] || '無資料'}\n`;
+                    telegramMessage += `通話等級: ${result['通話等級'] || '無資料'}\n`;
+                    telegramMessage += `副機數量: ${result['副機數量'] || '無資料'}\n`;
+                    telegramMessage += `數位: ${result['數位'] || '無資料'}\n`;
+                    telegramMessage += `備註: ${result['備註'] || '無資料'}\n`;
                 });
 
                 // 發送到 Telegram
@@ -484,51 +484,51 @@
                                                 <div style="margin-bottom: 20px; padding: 10px; background: #fff; border-radius: 5px;">
                                                     <div class="result-item">
                                                         <span class="label">號碼：</span>
-                                                        <span class="value">${highlightText(result['號碼'] || result['分機'] || result['Tel'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['號碼'] || result['分機'] || result['Tel'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">單位：</span>
-                                                        <span class="value">${highlightText(result['單位'] || result['單位'] || result['部門'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['單位'] || result['單位'] || result['部門'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">LENS：</span>
-                                                        <span class="value">${highlightText(result['LENS'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['LENS'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">機房端子編號：</span>
-                                                        <span class="value">${highlightText(result['機房端子編號'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['機房端子編號'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">遠端機櫃UG-50編號：</span>
-                                                        <span class="value">${highlightText(result['遠端機櫃UG-50編號'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['遠端機櫃UG-50編號'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">線組編號：</span>
-                                                        <span class="value">${highlightText(result['線組編號'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['線組編號'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">DID：</span>
-                                                        <span class="value">${highlightText(result['DID'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['DID'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">裝機位置：</span>
-                                                        <span class="value">${highlightText(result['裝機位置'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['裝機位置'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">通話等級：</span>
-                                                        <span class="value">${highlightText(result['通話等級'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['通話等級'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">副機數量：</span>
-                                                        <span class="value">${highlightText(result['副機數量'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['副機數量'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">數位：</span>
-                                                        <span class="value">${highlightText(result['數位'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['數位'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">備註：</span>
-                                                        <span class="value">${highlightText(result['備註'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['備註'] || '無資料', input)}</span>
                                                     </div>
                                                 </div>
                                             `).join('')}
@@ -613,51 +613,51 @@
                                         <div class="result-header">搜尋結果 #${index + 1}</div>
                                         <div class="result-item">
                                             <span class="label">號碼：</span>
-                                            <span class="value">${highlightText(result['號碼'] || result['分機'] || result['Tel'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['號碼'] || result['分機'] || result['Tel'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">單位：</span>
-                                            <span class="value">${highlightText(result['單位'] || result['單位'] || result['部門'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['單位'] || result['單位'] || result['部門'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">LENS：</span>
-                                            <span class="value">${highlightText(result['LENS'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['LENS'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">機房端子編號：</span>
-                                            <span class="value">${highlightText(result['機房端子編號'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['機房端子編號'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">遠端機櫃UG-50編號：</span>
-                                            <span class="value">${highlightText(result['遠端機櫃UG-50編號'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['遠端機櫃UG-50編號'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">線組編號：</span>
-                                            <span class="value">${highlightText(result['線組編號'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['線組編號'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">DID：</span>
-                                            <span class="value">${highlightText(result['DID'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['DID'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">裝機位置：</span>
-                                            <span class="value">${highlightText(result['裝機位置'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['裝機位置'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">通話等級：</span>
-                                            <span class="value">${highlightText(result['通話等級'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['通話等級'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">副機數量：</span>
-                                            <span class="value">${highlightText(result['副機數量'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['副機數量'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">數位：</span>
-                                            <span class="value">${highlightText(result['數位'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['數位'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">備註：</span>
-                                            <span class="value">${highlightText(result['備註'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['備註'] || '無資料', input)}</span>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -696,15 +696,15 @@
                 let telegramMessage = '調度電話搜尋結果:\n';
                 results.forEach((result, index) => {
                     telegramMessage += `\n--- 結果 ${index + 1} ---\n`;
-                    telegramMessage += `分機號碼: ${result['分機號碼'] || ''}\n`;
-                    telegramMessage += `C端子位置: ${result['C端子位置'] || ''}\n`;
-                    telegramMessage += `LENS: ${result['LENS'] || ''}\n`;
-                    telegramMessage += `線組編號(機房): ${result['線組編號(機房)'] || ''}\n`;
-                    telegramMessage += `線組編號(現場): ${result['線組編號(現場)'] || ''}\n`;
-                    telegramMessage += `使用單位: ${result['使用單位'] || ''}\n`;
-                    telegramMessage += `裝機位置: ${result['裝機位置'] || ''}\n`;
-                    telegramMessage += `副機數量: ${result['副機數量'] || ''}\n`;
-                    telegramMessage += `連絡電話: ${result['連絡電話'] || ''}\n`;
+                    telegramMessage += `分機號碼: ${result['分機號碼'] || '無資料'}\n`;
+                    telegramMessage += `C端子位置: ${result['C端子位置'] || '無資料'}\n`;
+                    telegramMessage += `LENS: ${result['LENS'] || '無資料'}\n`;
+                    telegramMessage += `線組編號(機房): ${result['線組編號(機房)'] || '無資料'}\n`;
+                    telegramMessage += `線組編號(現場): ${result['線組編號(現場)'] || '無資料'}\n`;
+                    telegramMessage += `使用單位: ${result['使用單位'] || '無資料'}\n`;
+                    telegramMessage += `裝機位置: ${result['裝機位置'] || '無資料'}\n`;
+                    telegramMessage += `副機數量: ${result['副機數量'] || '無資料'}\n`;
+                    telegramMessage += `連絡電話: ${result['連絡電話'] || '無資料'}\n`;
                 });
 
                 // 發送到 Telegram
@@ -820,39 +820,39 @@
                                                 <div style="margin-bottom: 20px; padding: 10px; background: #fff; border-radius: 5px;">
                                                     <div class="result-item">
                                                         <span class="label">分機號碼：</span>
-                                                        <span class="value">${highlightText(result['分機號碼'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['分機號碼'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">C端子位置：</span>
-                                                        <span class="value">${highlightText(result['C端子位置'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['C端子位置'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">LENS：</span>
-                                                        <span class="value">${highlightText(result['LENS'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['LENS'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">線組編號(機房)：</span>
-                                                        <span class="value">${highlightText(result['線組編號(機房)'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['線組編號(機房)'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">線組編號(現場)：</span>
-                                                        <span class="value">${highlightText(result['線組編號(現場)'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['線組編號(現場)'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">使用單位：</span>
-                                                        <span class="value">${highlightText(result['使用單位'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['使用單位'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">裝機位置：</span>
-                                                        <span class="value">${highlightText(result['裝機位置'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['裝機位置'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">副機數量：</span>
-                                                        <span class="value">${highlightText(result['副機數量'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['副機數量'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">連絡電話：</span>
-                                                        <span class="value">${highlightText(result['連絡電話'] || '', input)}</span>
+                                                        <span class="value">${highlightText(result['連絡電話'] || '無資料', input)}</span>
                                                     </div>
                                                 </div>
                                             `).join('')}
@@ -937,39 +937,39 @@
                                         <div class="result-header">搜尋結果 #${index + 1}</div>
                                         <div class="result-item">
                                             <span class="label">分機號碼：</span>
-                                            <span class="value">${highlightText(result['分機號碼'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['分機號碼'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">C端子位置：</span>
-                                            <span class="value">${highlightText(result['C端子位置'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['C端子位置'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">LENS：</span>
-                                            <span class="value">${highlightText(result['LENS'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['LENS'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">線組編號(機房)：</span>
-                                            <span class="value">${highlightText(result['線組編號(機房)'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['線組編號(機房)'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">線組編號(現場)：</span>
-                                            <span class="value">${highlightText(result['線組編號(現場)'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['線組編號(現場)'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">使用單位：</span>
-                                            <span class="value">${highlightText(result['使用單位'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['使用單位'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">裝機位置：</span>
-                                            <span class="value">${highlightText(result['裝機位置'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['裝機位置'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">副機數量：</span>
-                                            <span class="value">${highlightText(result['副機數量'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['副機數量'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">連絡電話：</span>
-                                            <span class="value">${highlightText(result['連絡電話'] || '', input)}</span>
+                                            <span class="value">${highlightText(result['連絡電話'] || '無資料', input)}</span>
                                         </div>
                                     </div>
                                 `).join('')}
