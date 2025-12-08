@@ -361,7 +361,6 @@
                     telegramMessage += `單位: ${result['單位'] || result['單位'] || result['部門'] || ''}\n`;
                     telegramMessage += `LENS: ${result['LENS'] || ''}\n`;
                     telegramMessage += `機房端子編號: ${result['機房端子編號'] || ''}\n`;
-                    telegramMessage += `遠端機櫃 MC-ID (第幾對線): ${result['遠端機櫃 MC-ID (第幾對線)'] || ''}\n`;
                     telegramMessage += `遠端機櫃UG-50編號: ${result['遠端機櫃UG-50編號'] || ''}\n`;
                     telegramMessage += `線組編號: ${result['線組編號'] || ''}\n`;
                     telegramMessage += `DID: ${result['DID'] || '無資料'}\n`;
@@ -390,7 +389,7 @@
                 if (results.length > 2) {
                     // 根據匹配欄位分類
                     const groupedResults = {};
-                    const fields = ['號碼', '單位', 'LENS', '機房端子編號','遠端機櫃 MC-ID (第幾對線)', '遠端機櫃UG-50編號', '線組編號', 'DID', '裝機位置', '通話等級', '副機數量', '數位', '備註'];
+                    const fields = ['號碼', '單位', 'LENS', '機房端子編號', '遠端機櫃UG-50編號', '線組編號', 'DID', '裝機位置', '通話等級', '副機數量', '數位', '備註'];
                     
                     results.forEach(result => {
                         fields.forEach(field => {
@@ -498,10 +497,6 @@
                                                     <div class="result-item">
                                                         <span class="label">機房端子編號：</span>
                                                         <span class="value">${highlightText(result['機房端子編號'] || '', input)}</span>
-                                                    </div>
-                                                    <div class="result-item">
-                                                        <span class="label">遠端機櫃 MC-ID (第幾對線)：</span>
-                                                        <span class="value">${highlightText(result['遠端機櫃 MC-ID (第幾對線)'] || '', input)}</span>
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">遠端機櫃UG-50編號：</span>
@@ -631,10 +626,6 @@
                                         <div class="result-item">
                                             <span class="label">機房端子編號：</span>
                                             <span class="value">${highlightText(result['機房端子編號'] || '', input)}</span>
-                                        </div>
-                                        <div class="result-item">
-                                            <span class="label">遠端機櫃 MC-ID (第幾對線)：</span>
-                                            <span class="value">${highlightText(result['遠端機櫃 MC-ID (第幾對線)'] || '', input)}</span>
                                         </div>
                                         <div class="result-item">
                                             <span class="label">遠端機櫃UG-50編號：</span>
