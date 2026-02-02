@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeIframe() {
         iframeContainer.classList.add('hidden');
         contentFrame.src = ''; // Stop loading
-        // We don't need to push state here because we typically get here via back button (popstate)
-        // If we closed via a button (if we had one), we would use history.back()
+        // Reload the page to reset state and refresh content as requested
+        window.location.reload();
     }
 
     // Handle Back Button
