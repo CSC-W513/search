@@ -193,22 +193,61 @@ textarea {
 /* Mobile Optimization */
 @media (max-width: 600px) {
     #main-container {
-        padding: 15px;
+        padding: 10px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
     
+    header {
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    #bulletin-board {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .bulletin-text {
+        font-size: 0.9rem;
+    }
+
+    /* Compact Grid for Mobile */
+    #links-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 5px;
+        flex-grow: 1; /* Allow grid to take available space */
+        align-content: start; /* Prevent huge gaps if space is extra */
+    }
+
     .link-card {
         padding: 15px;
+        min-height: auto; /* Remove fixed aspect ratio constraints if needed */
+        aspect-ratio: 1 / 1; /* Keep square but smaller */
     }
-    
-    .bulletin-text {
-        font-size: 0.95rem;
+
+    .img-container {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 10px;
+    }
+
+    .link-card span {
+        font-size: 0.9rem;
+        text-align: center;
     }
 }
 
-/* Links Grid */
+/* Links Grid - Default Desktop */
 #links-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 25px;
     padding: 10px;
 }
