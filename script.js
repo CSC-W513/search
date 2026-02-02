@@ -149,8 +149,10 @@ document.addEventListener('DOMContentLoaded', () => {
     postBulletinBtn.addEventListener('click', () => {
         const content = newBulletinInput.value.trim();
         if (content) {
-            addBulletin(content);
-            newBulletinInput.value = '';
+            if (confirm('確定要發布此公告嗎？')) {
+                addBulletin(content);
+                newBulletinInput.value = '';
+            }
         }
     });
 
@@ -160,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { data, error } = await supabase
                 .from('bulletins')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false }); // Latest first
             
             if (error) {
                 console.error('Error loading bulletins:', error);
@@ -172,6 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fallback LocalStorage Mode
             const stored = localStorage.getItem('bulletin_messages');
             const bulletins = stored ? JSON.parse(stored) : [];
+            // Sort by ID descending (which is timestamp)
+            bulletins.sort((a, b) => b.id - a.id);
             renderBulletins(bulletins);
         }
     }
@@ -278,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        bulletins.forEach(msg => {
+        bulletins.forEach((msg, index) => {
             const date = new Date(msg.created_at).toLocaleString('zh-TW', {
                 year: 'numeric', month: '2-digit', day: '2-digit', 
                 hour: '2-digit', minute: '2-digit'
@@ -286,6 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const div = document.createElement('div');
             div.className = 'bulletin-item';
+            if (index === 0) {
+                div.classList.add('latest-bulletin'); // Add flashing effect to the first item
+            }
             
             let adminActions = '';
             if (isAdmin) {
@@ -293,22 +300,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 const encodedContent = encodeURIComponent(msg.content);
                 adminActions = `
                     <div class="admin-actions">
-                        <span class="edit-btn" onclick="openEditModal(${msg.id}, '${encodedContent}')">編輯</span>
-                        <span class="delete-btn" onclick="deleteBulletin(${msg.id})">刪除</span>
+                        <span class="edit-btn" onclick="event.stopPropagation(); openEditModal(${msg.id}, '${encodedContent}')">編輯</span>
+                        <span class="delete-btn" onclick="event.stopPropagation(); deleteBulletin(${msg.id})">刪除</span>
                     </div>
                 `;
             }
 
+            // Extract summary (first line or first 20 chars)
+            const lines = msg.content.split('\n');
+            const summaryText = lines[0].length > 20 ? lines[0].substring(0, 20) + '...' : lines[0];
+            const hasMoreContent = msg.content.length > lines[0].length || lines.length > 1;
+
             div.innerHTML = `
-                <div class="bulletin-header">
-                    <div class="bulletin-date">${date}</div>
+                <div class="bulletin-header" onclick="toggleBulletin(this)">
+                    <div class="bulletin-info">
+                        ${index === 0 ? '<span class="new-tag">NEW!</span>' : ''}
+                        <span class="bulletin-date">${date}</span>
+                        <span class="bulletin-summary">${escapeHtml(summaryText)} ${hasMoreContent ? '<span class="more-indicator">▼</span>' : ''}</span>
+                    </div>
                     ${adminActions}
                 </div>
-                <div class="bulletin-text">${escapeHtml(msg.content)}</div>
+                <div class="bulletin-text hidden">${escapeHtml(msg.content)}</div>
             `;
             bulletinContent.appendChild(div);
         });
     }
+
+    window.toggleBulletin = function(header) {
+        const textDiv = header.nextElementSibling;
+        const indicator = header.querySelector('.more-indicator');
+        
+        textDiv.classList.toggle('hidden');
+        if (indicator) {
+            indicator.textContent = textDiv.classList.contains('hidden') ? '▼' : '▲';
+        }
+    };
 
     function escapeHtml(text) {
         const div = document.createElement('div');

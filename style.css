@@ -55,7 +55,7 @@ button:hover {
     color: #000;
 }
 
-/* Bulletin Board */
+/* Bulletin Styles */
 #bulletin-board {
     background-color: var(--card-bg);
     padding: 15px;
@@ -81,10 +81,10 @@ button:hover {
 
 .bulletin-item {
     border-bottom: 1px solid var(--border-color);
-    padding: 12px 0;
+    padding: 8px 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     position: relative;
     animation: fadeIn 0.3s ease;
 }
@@ -97,11 +97,53 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.bulletin-header:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.bulletin-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    overflow: hidden;
 }
 
 .bulletin-date {
     font-size: 0.85rem;
-    color: #aaa;
+    color: var(--secondary-color);
+    white-space: nowrap;
+}
+
+.bulletin-summary {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.more-indicator {
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    margin-left: 5px;
+}
+
+.new-tag {
+    background-color: #ff4757;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    animation: pulse 1.5s infinite;
 }
 
 .admin-actions {
@@ -132,17 +174,26 @@ button:hover {
 .delete-btn:hover { background: rgba(255, 107, 107, 0.1); }
 
 .bulletin-text {
-    white-space: pre-wrap;
-    line-height: 1.5;
-    word-break: break-word;
-    color: #fff;
     font-size: 1rem;
-    padding-left: 4px;
+    line-height: 1.5;
+    color: #e0e0e0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 10px 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    margin-top: 4px;
 }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 .no-bulletin {
@@ -151,13 +202,12 @@ button:hover {
     padding: 10px 0;
 }
 
+/* Admin Controls */
 #admin-controls {
+    margin-top: 15px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 10px;
-    border-top: 1px solid var(--border-color);
-    padding-top: 15px;
 }
 
 textarea {
@@ -427,28 +477,29 @@ input[type="password"] {
     #links-grid {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
+        gap: 8px !important;
         padding: 5px !important;
-        flex-grow: 1;
+        flex-grow: 0; /* Don't take extra space */
         align-content: start;
     }
 
     .link-card {
-        padding: 10px !important;
-        min-height: auto;
-        aspect-ratio: 1 / 1;
+        padding: 10px 5px !important; /* Less horizontal padding */
+        min-height: auto !important;
+        aspect-ratio: auto !important; /* Remove fixed square ratio */
+        height: auto !important; /* Let content dictate height */
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        min-width: 0 !important; /* Crucial for grid to shrink below content size if needed */
+        min-width: 0 !important;
         width: 100% !important;
     }
 
     .img-container {
-        width: 50px !important;
-        height: 50px !important;
-        margin-bottom: 8px !important;
+        width: 42px !important; /* Slightly smaller icon */
+        height: 42px !important;
+        margin-bottom: 5px !important; /* Less margin */
     }
 
     .link-card span {
