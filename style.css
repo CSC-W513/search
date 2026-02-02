@@ -511,11 +511,15 @@ input[type="password"] {
         align-items: center;
         min-width: 0 !important;
         width: 100% !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
     }
 
     .img-container {
-        width: 42px !important; /* Slightly smaller icon */
-        height: 42px !important;
+        width: 90px !important; /* Larger icon */
+        height: 90px !important;
         margin-bottom: 5px !important; /* Less margin */
     }
 
