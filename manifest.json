@@ -1,0 +1,16 @@
+{
+  "name": "系統功能整合",
+  "short_name": "系統整合",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "W513.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
