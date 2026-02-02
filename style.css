@@ -29,30 +29,31 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
     padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 h1 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: var(--accent-color);
+    font-size: 1.2rem; /* Shrunk from 1.5rem */
+    font-weight: 500;
+    color: var(--secondary-color);
+    letter-spacing: 1px;
 }
 
-button {
-    background-color: var(--card-bg);
-    color: var(--accent-color);
-    border: 1px solid var(--accent-color);
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+button#admin-login-btn {
+    background-color: transparent;
+    padding: 8px;
+    color: var(--secondary-color);
+    box-shadow: none;
+    width: auto;
+    border: none;
 }
 
-button:hover {
-    background-color: var(--accent-color);
-    color: #000;
+button#admin-login-btn:hover {
+    color: #fff;
+    transform: rotate(90deg);
+    background-color: transparent;
 }
 
 /* Bulletin Styles */
@@ -75,16 +76,32 @@ button:hover {
 }
 
 #bulletin-content {
-    min-height: 30px;
-    margin-bottom: 10px;
+    max-height: 180px; /* Adjust based on approx 3 items height */
+    overflow-y: auto;
+    padding-right: 5px; /* Space for scrollbar */
+}
+
+/* Custom Scrollbar for Bulletin */
+#bulletin-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#bulletin-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+#bulletin-content::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 3px;
 }
 
 .bulletin-item {
     border-bottom: 1px solid var(--border-color);
-    padding: 8px 0;
+    padding: 6px 0; /* Reduced padding */
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     position: relative;
     animation: fadeIn 0.3s ease;
 }
@@ -116,13 +133,13 @@ button:hover {
 }
 
 .bulletin-date {
-    font-size: 0.85rem;
+    font-size: 0.75rem; /* Smaller date */
     color: var(--secondary-color);
     white-space: nowrap;
 }
 
 .bulletin-summary {
-    font-size: 0.95rem;
+    font-size: 0.85rem; /* Smaller summary text */
     color: var(--text-color);
     white-space: nowrap;
     overflow: hidden;
@@ -131,7 +148,7 @@ button:hover {
 }
 
 .more-indicator {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--secondary-color);
     margin-left: 5px;
 }
@@ -139,8 +156,8 @@ button:hover {
 .new-tag {
     background-color: #ff4757;
     color: white;
-    font-size: 0.7rem;
-    padding: 2px 6px;
+    font-size: 0.65rem; /* Smaller tag */
+    padding: 1px 5px;
     border-radius: 4px;
     font-weight: bold;
     animation: pulse 1.5s infinite;
@@ -174,12 +191,12 @@ button:hover {
 .delete-btn:hover { background: rgba(255, 107, 107, 0.1); }
 
 .bulletin-text {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 0.9rem; /* Smaller expanded text */
+    line-height: 1.4;
     color: #e0e0e0;
     white-space: pre-wrap;
     word-break: break-word;
-    padding: 10px 8px;
+    padding: 8px 6px;
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     margin-top: 4px;

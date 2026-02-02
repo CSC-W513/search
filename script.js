@@ -183,6 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function addBulletin(content) {
         if (supabase) {
             // Supabase Mode
+            // The created_at field is automatically handled by default timezone('utc'::text, now()) in the database schema
+            // which saves the current UTC time.
             const { data, error } = await supabase
                 .from('bulletins')
                 .insert([{ content: content }])
@@ -195,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             // Fallback LocalStorage Mode
+            // Store as ISO string (UTC) to match Supabase behavior logic
             const stored = localStorage.getItem('bulletin_messages');
             const bulletins = stored ? JSON.parse(stored) : [];
             const newMsg = {
@@ -283,10 +286,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         bulletins.forEach((msg, index) => {
-            const date = new Date(msg.created_at).toLocaleString('zh-TW', {
+            // Ensure we handle both Supabase (UTC string) and potential legacy data correctly
+            // msg.created_at from Supabase is ISO string (e.g. 2023-10-27T10:00:00+00:00)
+            // new Date() parses this correctly into local time
+            const dateObj = new Date(msg.created_at);
+            
+            const date = dateObj.toLocaleString('zh-TW', {
                 year: 'numeric', month: '2-digit', day: '2-digit', 
-                hour: '2-digit', minute: '2-digit'
-            }); // Compact date format
+                hour: '2-digit', minute: '2-digit',
+                hour12: false // Use 24-hour format for clarity
+            }); 
             
             const div = document.createElement('div');
             div.className = 'bulletin-item';
