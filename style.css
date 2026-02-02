@@ -441,6 +441,8 @@ input[type="password"] {
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        min-width: 0 !important; /* Crucial for grid to shrink below content size if needed */
+        width: 100% !important;
     }
 
     .img-container {
@@ -453,5 +455,6 @@ input[type="password"] {
         font-size: 0.85rem !important;
         text-align: center;
         line-height: 1.2;
+        word-break: break-word; /* Prevent long text from breaking layout */
     }
 }

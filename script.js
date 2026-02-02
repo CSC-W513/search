@@ -53,53 +53,21 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBulletin();
     checkLoginStatus();
 
-    // --- Navigation / Iframe Logic ---
+    // --- Navigation ---
     linkCards.forEach(card => {
         card.addEventListener('click', () => {
             const url = card.dataset.url;
-            openIframe(url);
+            // Open in new tab/window to ensure permissions work and satisfy "pop out new page" request
+            window.open(url, '_blank');
         });
     });
 
-    function openIframe(url) {
-        contentFrame.src = url;
-        iframeContainer.classList.remove('hidden');
-        
-        // Push state to history to capture back button
-        history.pushState({ view: 'iframe' }, '', '#view');
-    }
-
-    function closeIframe() {
-        iframeContainer.classList.add('hidden');
-        contentFrame.src = ''; // Stop loading
-        // Reload the page to reset state and refresh content as requested
-        window.location.reload();
-    }
-
-    // Handle Back Button
-    window.addEventListener('popstate', (event) => {
-        // If we were in iframe view (based on our logic, we only push state when opening iframe)
-        // So if popstate fires, it means we are going BACK to the main state (null state)
-        
-        // Check if iframe is currently visible
-        if (!iframeContainer.classList.contains('hidden')) {
-            const now = Date.now();
-            
-            if (now - lastBackPressTime < BACK_PRESS_THRESHOLD) {
-                // Pressed twice within threshold -> actually leave (close iframe)
-                closeIframe();
-            } else {
-                // First press -> show toast and push state back
-                showToast();
-                lastBackPressTime = now;
-                
-                // Important: We need to stay in the "iframe" state effectively to capture the next back press
-                // Since popstate already happened, we are technically at "Main" state now.
-                // We push "iframe" state again immediately.
-                history.pushState({ view: 'iframe' }, '', '#view');
-            }
-        }
-    });
+    // Handle Page Visibility (Optional: Reload if needed when returning, though less critical with new tab)
+    // window.addEventListener('visibilitychange', () => {
+    //     if (document.visibilityState === 'visible') {
+    //         // window.location.reload(); 
+    //     }
+    // });
 
     function showToast() {
         toastMessage.classList.remove('hidden');
