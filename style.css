@@ -682,4 +682,29 @@ input[type="password"] {
         line-height: 1.1;
         word-break: break-word;
     }
+
+    /* Popup Mobile Optimization */
+    #announcement-popup .popup-icon-wrapper {
+        width: 40px !important;
+        height: 40px !important;
+        margin-bottom: 5px !important;
+    }
+
+    #announcement-popup .popup-icon {
+        font-size: 1.2rem !important;
+    }
+
+    #announcement-popup h2#popup-title {
+        font-size: 1.2rem !important;
+        margin-top: 0 !important;
+        margin-bottom: 10px !important;
+    }
+
+    #announcement-popup .popup-text {
+        font-size: 1rem !important; /* Ensure readable text size */
+        padding: 15px !important;
+        max-height: 50vh !important; /* Allow larger content area */
+        overflow-y: auto;
+        border-left-width: 4px !important; /* Make accent more visible */
+    }
 }
