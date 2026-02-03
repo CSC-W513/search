@@ -49,6 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
     const closeModals = document.querySelectorAll('.close-modal');
 
+    // Announcement Popup Elements
+    const durationDaysInput = document.getElementById('duration-days');
+    const durationHoursInput = document.getElementById('duration-hours');
+    const announcementPopup = document.getElementById('announcement-popup');
+    const closePopupBtn = document.getElementById('close-popup-btn');
+    const popupContent = document.getElementById('popup-content');
+    const popupTitle = document.getElementById('popup-title');
+
     // --- Initialization ---
     loadBulletin();
     checkLoginStatus();
@@ -81,6 +89,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     }
 
+    // --- Helper Functions ---
+    function parseBulletinContent(rawContent) {
+        const metaRegex = /^\[META:({.*?})\]/;
+        const match = rawContent.match(metaRegex);
+        if (match) {
+            try {
+                const meta = JSON.parse(match[1]);
+                const content = rawContent.replace(match[0], '');
+                return { meta, content };
+            } catch (e) {
+                return { meta: null, content: rawContent };
+            }
+        }
+        return { meta: null, content: rawContent };
+    }
+
+    function showBulletinPopup(content, title = '公告內容') {
+        if (!popupContent || !announcementPopup) return;
+        popupContent.innerHTML = escapeHtml(content);
+        if (popupTitle) popupTitle.textContent = title;
+        announcementPopup.classList.remove('hidden');
+    }
+
+    function checkPopup(latestBulletin) {
+        if (!latestBulletin) return;
+        
+        const { meta, content } = parseBulletinContent(latestBulletin.content);
+        
+        if (meta && meta.duration) {
+            const createdTime = new Date(latestBulletin.created_at).getTime();
+            const durationMs = meta.duration * 60 * 60 * 1000;
+            const now = Date.now();
+            
+            if (now < createdTime + durationMs) {
+                // Show popup
+                showBulletinPopup(content, '最新公告');
+            }
+        }
+    }
+
     // --- Admin / Bulletin Logic ---
     
     // Login Modal
@@ -98,12 +146,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Popup Close Button
+    if (closePopupBtn) {
+        closePopupBtn.addEventListener('click', () => {
+            announcementPopup.classList.add('hidden');
+        });
+    }
+
     window.addEventListener('click', (e) => {
         if (e.target === loginModal) {
             loginModal.classList.add('hidden');
         }
         if (e.target === editModal) {
             editModal.classList.add('hidden');
+        }
+        if (e.target === announcementPopup) {
+            announcementPopup.classList.add('hidden');
         }
     });
 
@@ -148,9 +206,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bulletin Board
     postBulletinBtn.addEventListener('click', () => {
         const content = newBulletinInput.value.trim();
+        const days = parseInt(durationDaysInput.value) || 0;
+        const hours = parseInt(durationHoursInput.value) || 0;
+        const totalHours = (days * 24) + hours;
+
         if (content) {
-            if (confirm('確定要發布此公告嗎？')) {
-                addBulletin(content);
+            let confirmMsg = '確定要發布此公告嗎？';
+            if (totalHours > 0) {
+                confirmMsg += `\n(提示窗將顯示 ${days} 天 ${hours} 小時)`;
+            }
+
+            if (confirm(confirmMsg)) {
+                let finalContent = content;
+                if (totalHours > 0) {
+                    const meta = { duration: totalHours };
+                    finalContent = `[META:${JSON.stringify(meta)}]${content}`;
+                }
+                addBulletin(finalContent);
                 newBulletinInput.value = '';
             }
         }
@@ -285,6 +357,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Check popup for the latest bulletin
+        checkPopup(bulletins[0]);
+
         bulletins.forEach((msg, index) => {
             // Ensure we handle both Supabase (UTC string) and potential legacy data correctly
             // msg.created_at from Supabase is ISO string (e.g. 2023-10-27T10:00:00+00:00)
@@ -297,6 +372,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 hour12: false // Use 24-hour format for clarity
             }); 
             
+            // Parse content to separate metadata and real content
+            const { meta, content } = parseBulletinContent(msg.content);
+
             const div = document.createElement('div');
             div.className = 'bulletin-item';
             if (index === 0) {
@@ -305,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let adminActions = '';
             if (isAdmin) {
-                // Encode content to pass safely to onclick
+                // Encode content to pass safely to onclick (pass RAW content to allow editing metadata if needed)
                 const encodedContent = encodeURIComponent(msg.content);
                 adminActions = `
                     <div class="admin-actions">
@@ -316,34 +394,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Extract summary (first line or first 20 chars)
-            const lines = msg.content.split('\n');
+            const lines = content.split('\n');
             const summaryText = lines[0].length > 20 ? lines[0].substring(0, 20) + '...' : lines[0];
-            const hasMoreContent = msg.content.length > lines[0].length || lines.length > 1;
+            const hasMoreContent = content.length > lines[0].length || lines.length > 1;
 
             div.innerHTML = `
-                <div class="bulletin-header" onclick="toggleBulletin(this)">
+                <div class="bulletin-header">
                     <div class="bulletin-info">
                         ${index === 0 ? '<span class="new-tag">NEW!</span>' : ''}
                         <span class="bulletin-date">${date}</span>
-                        <span class="bulletin-summary">${escapeHtml(summaryText)} ${hasMoreContent ? '<span class="more-indicator">▼</span>' : ''}</span>
+                        <span class="bulletin-summary">${escapeHtml(summaryText)}</span>
                     </div>
                     ${adminActions}
                 </div>
-                <div class="bulletin-text hidden">${escapeHtml(msg.content)}</div>
             `;
+            
+            // Add click event to open popup
+            const header = div.querySelector('.bulletin-header');
+            header.addEventListener('click', () => {
+                showBulletinPopup(content, '公告內容');
+            });
+            
             bulletinContent.appendChild(div);
         });
     }
 
-    window.toggleBulletin = function(header) {
-        const textDiv = header.nextElementSibling;
-        const indicator = header.querySelector('.more-indicator');
-        
-        textDiv.classList.toggle('hidden');
-        if (indicator) {
-            indicator.textContent = textDiv.classList.contains('hidden') ? '▼' : '▲';
-        }
-    };
+    // window.toggleBulletin = function(header) { ... } // Removed as we use popup now
 
     function escapeHtml(text) {
         const div = document.createElement('div');
