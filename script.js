@@ -179,6 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function showBulletinPopup(bulletin, title = '公告內容') {
         if (!popupContent || !announcementPopup || !bulletin) return;
         
+        // Check if popup is already open for this bulletin to prevent loop/double counting
+        const isAlreadyOpen = !announcementPopup.classList.contains('hidden') && currentPopupId === bulletin.id;
+
         currentPopupId = bulletin.id; // Store ID for realtime updates
 
         const { meta, content } = parseBulletinContent(bulletin.content);
@@ -194,11 +197,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         announcementPopup.classList.remove('hidden');
         
-        // Increment read count
-        incrementReadCount(bulletin.id);
+        // Increment read count ONLY if it wasn't already open
+        if (!isAlreadyOpen) {
+            incrementReadCount(bulletin.id);
+        }
     }
 
     async function incrementReadCount(id) {
+        console.log('Attempting to increment read count for:', id);
+        
         // Optimistically update UI
         if (popupReadCount) {
             const currentText = popupReadCount.textContent;
@@ -213,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  const { error: rpcError } = await supabase.rpc('increment_read_count', { row_id: id });
                  
                  if (rpcError) {
+                     console.warn('RPC increment failed, falling back to update:', rpcError);
                      // Fallback: Fetch -> Update
                      const { data: current, error: fetchError } = await supabase
                         .from('bulletins')
@@ -222,8 +230,13 @@ document.addEventListener('DOMContentLoaded', () => {
                      
                      if (!fetchError && current) {
                          const newCount = (current.read_count || 0) + 1;
-                         await supabase.from('bulletins').update({ read_count: newCount }).eq('id', id);
+                         const { error: updateError } = await supabase.from('bulletins').update({ read_count: newCount }).eq('id', id);
+                         if (updateError) console.error('Fallback update failed:', updateError);
+                     } else {
+                        console.error('Fallback fetch failed:', fetchError);
                      }
+                 } else {
+                     console.log('Read count incremented via RPC');
                  }
             } catch (e) {
                 console.error('Error incrementing read count:', e);
