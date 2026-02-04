@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // which saves the current UTC time.
             const { data, error } = await supabase
                 .from('bulletins')
-                .insert([{ content: content }])
+                .insert([{ content: content, read_count: 0 }])
                 .select();
 
             if (error) {
