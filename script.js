@@ -30,6 +30,43 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_KEY') {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            
+            // --- Realtime Subscription ---
+            // Subscribe to all changes in the 'bulletins' table
+            supabase.channel('public:bulletins')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'bulletins' }, payload => {
+                    console.log('Realtime update received:', payload);
+                    
+                    if (payload.eventType === 'INSERT') {
+                        // Optimistically or refetch. Simplest is refetch to maintain sort order.
+                        // Or manually prepend:
+                        // But loadBulletin handles sorting.
+                        loadBulletin(); 
+                    } else if (payload.eventType === 'UPDATE') {
+                        const updatedRow = payload.new;
+                        
+                        // Update Popup if it's currently showing this bulletin
+                        // We check the content or some ID if we had stored it.
+                        // Since we don't store the current popup ID in a variable accessible here easily,
+                        // we can check the title or just update if the popup is visible.
+                        // Better: let's store currentPopupId.
+                        
+                        // Update the Read Count in Popup
+                        if (currentPopupId === updatedRow.id && popupReadCount) {
+                            popupReadCount.textContent = `已讀: ${updatedRow.read_count || 0}`;
+                        }
+
+                        // Also refresh the list to show new content if it changed
+                        loadBulletin();
+                    } else if (payload.eventType === 'DELETE') {
+                        loadBulletin();
+                        // If popup is open for this ID, maybe close it?
+                        if (currentPopupId === payload.old.id) {
+                            announcementPopup.classList.add('hidden');
+                        }
+                    }
+                })
+                .subscribe();
         } else {
             console.warn('Supabase credentials not set. Using local storage mode for demo.');
         }
@@ -41,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastBackPressTime = 0;
     const BACK_PRESS_THRESHOLD = 2000; // 2 seconds
     let currentEditingId = null; // Track which bulletin is being edited
+    let currentPopupId = null; // Track which bulletin is currently shown in popup
     
     // --- Elements (New) ---
     const editModal = document.getElementById('edit-modal');
@@ -56,6 +94,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const closePopupBtn = document.getElementById('close-popup-btn');
     const popupContent = document.getElementById('popup-content');
     const popupTitle = document.getElementById('popup-title');
+    const popupReadCount = document.getElementById('popup-read-count');
+
+    // --- Icons Configuration ---
+    const newIconSelector = document.getElementById('new-icon-selector');
+    const editIconSelector = document.getElementById('edit-icon-selector');
+    
+    const ICONS = ['😀', '😂', '😍', '🤔', '😎', '👍', '👎', '👌', '✌️', '👋', '🐶', '🐱', '🐭', '🐰', '🦊', '📢', '🔥', '✨', '💡', '🎉'];
+
+    function renderIcons(container, targetInput) {
+        if (!container || !targetInput) return;
+        container.innerHTML = '';
+        ICONS.forEach(icon => {
+            const span = document.createElement('span');
+            span.className = 'icon-option';
+            span.textContent = icon;
+            span.addEventListener('click', () => {
+                insertAtCursor(targetInput, icon);
+            });
+            container.appendChild(span);
+        });
+    }
+
+    function insertAtCursor(input, text) {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const value = input.value;
+        input.value = value.substring(0, start) + text + value.substring(end);
+        input.selectionStart = input.selectionEnd = start + text.length;
+        input.focus();
+    }
+
+    renderIcons(newIconSelector, newBulletinInput);
+    renderIcons(editIconSelector, editBulletinContent);
 
     // --- Initialization ---
     loadBulletin();
@@ -105,11 +176,70 @@ document.addEventListener('DOMContentLoaded', () => {
         return { meta: null, content: rawContent };
     }
 
-    function showBulletinPopup(content, title = '公告內容') {
-        if (!popupContent || !announcementPopup) return;
+    function showBulletinPopup(bulletin, title = '公告內容') {
+        if (!popupContent || !announcementPopup || !bulletin) return;
+        
+        currentPopupId = bulletin.id; // Store ID for realtime updates
+
+        const { meta, content } = parseBulletinContent(bulletin.content);
+        
         popupContent.innerHTML = escapeHtml(content);
         if (popupTitle) popupTitle.textContent = title;
+        
+        // Update Read Count Display
+        let count = bulletin.read_count || 0;
+        if (popupReadCount) {
+            popupReadCount.textContent = `已讀: ${count}`;
+        }
+
         announcementPopup.classList.remove('hidden');
+        
+        // Increment read count
+        incrementReadCount(bulletin.id);
+    }
+
+    async function incrementReadCount(id) {
+        // Optimistically update UI
+        if (popupReadCount) {
+            const currentText = popupReadCount.textContent;
+            const currentCount = parseInt(currentText.replace('已讀: ', '')) || 0;
+            popupReadCount.textContent = `已讀: ${currentCount + 1}`;
+        }
+
+        if (supabase) {
+            // Try to increment on Supabase
+            try {
+                 // Try RPC first (best practice if function exists)
+                 const { error: rpcError } = await supabase.rpc('increment_read_count', { row_id: id });
+                 
+                 if (rpcError) {
+                     // Fallback: Fetch -> Update
+                     const { data: current, error: fetchError } = await supabase
+                        .from('bulletins')
+                        .select('read_count')
+                        .eq('id', id)
+                        .single();
+                     
+                     if (!fetchError && current) {
+                         const newCount = (current.read_count || 0) + 1;
+                         await supabase.from('bulletins').update({ read_count: newCount }).eq('id', id);
+                     }
+                 }
+            } catch (e) {
+                console.error('Error incrementing read count:', e);
+            }
+        } else {
+            // LocalStorage Mode
+            const stored = localStorage.getItem('bulletin_messages');
+            if (stored) {
+                const bulletins = JSON.parse(stored);
+                const index = bulletins.findIndex(b => b.id === id);
+                if (index !== -1) {
+                    bulletins[index].read_count = (bulletins[index].read_count || 0) + 1;
+                    localStorage.setItem('bulletin_messages', JSON.stringify(bulletins));
+                }
+            }
+        }
     }
 
     function checkPopup(latestBulletin) {
@@ -124,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (now < createdTime + durationMs) {
                 // Show popup
-                showBulletinPopup(content, '最新公告');
+                showBulletinPopup(latestBulletin, '最新公告');
             }
         }
     }
@@ -150,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closePopupBtn) {
         closePopupBtn.addEventListener('click', () => {
             announcementPopup.classList.add('hidden');
+            currentPopupId = null;
         });
     }
 
@@ -162,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (e.target === announcementPopup) {
             announcementPopup.classList.add('hidden');
+            currentPopupId = null;
         }
     });
 
@@ -224,6 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 addBulletin(finalContent);
                 newBulletinInput.value = '';
+                durationDaysInput.value = '';
+                durationHoursInput.value = '';
+                showToast();
             }
         }
     });
@@ -412,7 +547,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add click event to open popup
             const header = div.querySelector('.bulletin-header');
             header.addEventListener('click', () => {
-                showBulletinPopup(content, '公告內容');
+                showBulletinPopup(msg, '公告內容');
             });
             
             bulletinContent.appendChild(div);
