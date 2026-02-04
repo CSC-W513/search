@@ -684,27 +684,45 @@ input[type="password"] {
     }
 
     /* Popup Mobile Optimization */
+    #announcement-popup .modal-content {
+        padding: 15px !important;
+        width: 85% !important;
+        gap: 8px !important;
+    }
+
+    #announcement-popup .popup-header {
+        margin-bottom: 5px !important;
+    }
+
     #announcement-popup .popup-icon-wrapper {
-        width: 40px !important;
-        height: 40px !important;
+        width: 35px !important;
+        height: 35px !important;
         margin-bottom: 5px !important;
     }
 
     #announcement-popup .popup-icon {
-        font-size: 1.2rem !important;
+        font-size: 1.1rem !important;
     }
 
     #announcement-popup h2#popup-title {
-        font-size: 1.2rem !important;
+        font-size: 1.1rem !important;
         margin-top: 0 !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 5px !important;
     }
 
     #announcement-popup .popup-text {
-        font-size: 1rem !important; /* Ensure readable text size */
-        padding: 15px !important;
-        max-height: 50vh !important; /* Allow larger content area */
+        font-size: 0.95rem !important; /* Ensure readable text size */
+        padding: 10px !important;
+        margin-bottom: 5px !important;
+        max-height: 55vh !important; /* Allow larger content area */
         overflow-y: auto;
-        border-left-width: 4px !important; /* Make accent more visible */
+        border-left-width: 3px !important; /* Make accent more visible */
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    #close-popup-btn {
+        padding: 6px 20px !important;
+        font-size: 0.9rem !important;
     }
 }
